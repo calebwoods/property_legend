@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PropertyLegend</title>
+    <meta charset='utf-8' />
+    <meta content='width=1024, user-scalable=no' name='viewport' />
+    <!-- deck.js's core css -->
+    <link href="deck.js/core/deck.core.css" rel="stylesheet" type="text/css"/>
+    <!-- deck.js extension CSS files -->
+    <link href="deck.js/extensions/codemirror/deck.codemirror.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/goto/deck.goto.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/hash/deck.hash.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/menu/deck.menu.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/navigation/deck.navigation.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/scale/deck.scale.css" rel="stylesheet" type="text/css"/>
+    <link href="deck.js/extensions/status/deck.status.css" rel="stylesheet" type="text/css"/>
+    <!-- all css in the css dir: Keydown CSS, your custom CSS, and themes from deck.js -->
+    <link href="css/keydown.css" rel="stylesheet" type="text/css"/>
+    <link href="css/default.css" rel="stylesheet" type="text/css"/>
+    <link href="css/horizontal-slide.css" rel="stylesheet" type="text/css"/>
+    <link href="css/property_legend.css" rel="stylesheet" type="text/css"/>
+    <link href="css/swiss.css" rel="stylesheet" type="text/css"/>
+    <!-- Modernizr (provided for legacy browsers) -->
+    <script src="deck.js/support/modernizr.custom.js" type="text/javascript"></script>
+  </head>
+  <body class='deck-container keydown'>
+    <section class='slide'>
+      <div class='spacer top'></div>
+      <div class='content'>
+        <h1>PropertyLegend</h1>
+        
+        <h2>API Driven Forms</h2>
+        
+        <h3>Caleb Woods</h3>
+      </div>
+      <div class='spacer bottom'></div>
+    </section>
+    <section class='left slide'>
+      <div class='spacer top'></div>
+      <div class='content'>
+        <h1>The Problem</h1>
+        
+        <ul>
+        <li>API with large amount data</li>
+        <li>Complex validations</li>
+        <li>Want to keep all validation in one place</li>
+        </ul>
+      </div>
+      <div class='spacer bottom'></div>
+    </section>
+    <section class='left slide'>
+      <div class='spacer top'></div>
+      <div class='content'>
+        <h1>Solution: PropertyLegend</h1>
+        
+        <ul>
+        <li>Describes every object, relationship, and property</li>
+        <li>Dynamically built from object model</li>
+        </ul>
+      </div>
+      <div class='spacer bottom'></div>
+    </section>
+    <section class='left slide'>
+  <div class='spacer top'></div>
+  <div class='content'>
+    <h1>Example</h1>
+    
+    <p><textarea class='code' display='none' mode='js'>"source": {&#x000A;  "units":  ["Meteorological","Nutrients","Chem/Fert","General","Pollutants","Wildlife"],&#x000A;  "value": {&#x000A;    "type": "HashedPicklist",&#x000A;    "allowed_values": {&#x000A;      "Meteorological":["Frost","Hail","High temperatures"],&#x000A;      "Nutrients":["Oxygen deficiency","Acidity, high","Alkalinity, high"]&#x000A;    },&#x000A;    "options": { "allow_blank": true }&#x000A;  }&#x000A;},&#x000A;life_stage": {&#x000A;  "units": null,&#x000A;  "value": {&#x000A;    "type": "Picklist",&#x000A;    "allowed_values": ["eggs","small larvae","large larvae","nymphs"],&#x000A;    "options": { "allow_blank": true}&#x000A;  }&#x000A;},&#x000A;"comments": {&#x000A;  "units": null,&#x000A;  "value": {&#x000A;    "type": "Text",&#x000A;    "options": {}&#x000A;  }&#x000A;}</textarea>
+</p>
+  </div>
+  <div class='spacer bottom'></div>
+</section>
+    <section class='left slide'>
+  <div class='spacer top'></div>
+  <div class='content'>
+    <h1>Benefits to Rails Code</h1>
+
+<ul>
+<li>Put names to complex validations (Custom Validators)</li>
+<li>Objects have to be able to describe themselves (Smaller)</li>
+<li>Easier to test</li>
+<li>Single medium to discussing API that is language agnostic</li>
+</ul>
+  </div>
+  <div class='spacer bottom'></div>
+</section>
+    <section class='left slide'>
+  <div class='spacer top'></div>
+  <div class='content'>
+    <h1>Previous Code</h1>
+
+<p><textarea class='code' display='none' mode='ruby'>class CropInjury < ActiveRecord::Base&#x000A;&#x000A;  include AssignApiAttributes&#x000A;&#x000A;  belongs_to :scout, touch: true&#x000A;  belongs_to :created_by, class_name: 'User'&#x000A;&#x000A;  validates_inclusion_of :category, allow_blank: true, in: %w(Chem/Fert General)&#x000A;  validates_inclusion_of :units, allow_blank: true, in: lambda { |injury| units }&#x000A;  validates_numericality_of :amount, unless: :units_is_scale, allow_blank: true&#x000A;  validate :validate_scale, if: :units_is_scale&#x000A;  validate :validate_source&#x000A;&#x000A;  attr_protected :scout_id, :created_by_id&#x000A;&#x000A;  before_save :set_order&#x000A;  scope :by_order, order("crop_injuries.order ASC")&#x000A;&#x000A;  private&#x000A;  def units_is_scale&#x000A;    self.units.try(:include?, "Scale")&#x000A;  end&#x000A;&#x000A;  def set_order&#x000A;  def scales&#x000A;  def validate_scale&#x000A;  def sources&#x000A;  def validate_source&#x000A;  def self.units&#x000A;&#x000A;end</textarea>
+</p>
+  </div>
+  <div class='spacer bottom'></div>
+</section>
+    <section class='left slide'>
+  <div class='spacer top'></div>
+  <div class='content'>
+    <h1>Refactored</h1>
+    
+    <p><textarea class='code' display='none' mode='ruby'>class CropInjury < ActiveRecord::Base&#x000A;&#x000A;  include AssignApiAttributes&#x000A;  include Orderable&#x000A;  include Properties&#x000A;&#x000A;  belongs_to :scout, touch: true&#x000A;  belongs_to :created_by, class_name: 'User'&#x000A;&#x000A;  attr_protected :scout_id, :created_by_id, :properties&#x000A;&#x000A;  property :source, class_name: "CropInjurySource"&#x000A;  property :amount, class_name: "CropInjuryAmount"&#x000A;&#x000A;end</textarea>
+</p>
+  </div>
+  <div class='spacer bottom'></div>
+</section>
+    <!-- deck.js navigation extension -->
+    <a class='deck-prev-link' href='#' title='Previous'>&#8592;</a>
+    <a class='deck-next-link' href='#' title='Next'>&#8594;</a>
+    <!-- deck.js hash extension -->
+    <a class='deck-permalink' href='.' title='Permalink to this slide'>#</a>
+    <!-- deck.js status extension -->
+    <p class='deck-status'>
+      <span class='deck-status-current'></span>
+      /
+      <span class='deck-status-total'></span>
+    </p>
+    <!-- jQuery & deck.js -->
+    <script src="deck.js/support/jquery.1.6.4.min.js" type="text/javascript"></script>
+    <script src="deck.js/core/deck.core.js" type="text/javascript"></script>
+    <!-- deck.js extension JS files -->
+    <script src="deck.js/extensions/codemirror/codemirror.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/deck.codemirror.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/clike/clike.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/clojure/clojure.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/coffeescript/coffeescript.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/css/css.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/diff/diff.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/haskell/haskell.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/htmlmixed/htmlmixed.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/javascript/javascript.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/lua/lua.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/php/php.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/plsql/plsql.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/python/python.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/r/r.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/rst/rst.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/ruby/ruby.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/scheme/scheme.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/smalltalk/smalltalk.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/sparql/sparql.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/stex/stex.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/velocity/velocity.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/xml/xml.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/xmlpure/xmlpure.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/codemirror/mode/yaml/yaml.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/goto/deck.goto.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/hash/deck.hash.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/menu/deck.menu.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/navigation/deck.navigation.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/scale/deck.scale.js" type="text/javascript"></script>
+    <script src="deck.js/extensions/status/deck.status.js" type="text/javascript"></script>
+    <!-- your custom JS here, including call to initialize deck.js-codemirror -->
+    <script src="js/property_legend.js" type="text/javascript"></script>
+    <!-- Initialize the deck. -->
+    <script type='text/javascript'>
+      $(function() { $.deck('.slide'); });
+    </script>
+  </body>
+</html>
